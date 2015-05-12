@@ -77,6 +77,29 @@ func report_on_seq_scans(db *sql.DB) {
 	check(rows.Err())
 }
 
+func report_on_diskbased_queries(db *sql.DB) {
+	fmt.Println("--------------------------------------")
+	fmt.Println("\t\tDiskbased Queries")
+	fmt.Println("--------------------------------------")
+
+	query := "select pg_user.usename, stl_querytext.text, svl_query_summary.rows, svl_query_summary.workmem/(1024*1024*1024) as workmem_mb, svl_query_summary.label from svl_query_summary left join STL_QUERYTEXT on svl_query_summary.query=stl_querytext.query left join pg_user on pg_user.usesysid=stl_querytext.userid where is_diskbased='t' order by workmem_mb desc, svl_query_summary.rows desc;"
+
+	rows, err := db.Query(query)
+	check(err)
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var username, query, rows_affected, workmem, label string
+
+		err := rows.Scan(&username, &query, &rows_affected, &workmem, &label)
+		check(err)
+		fmt.Println("%s\t%s\t%s\t%s\t%s", username, query, rows_affected, workmem, label)
+	}
+
+	check(rows.Err())
+}
+
 func report_on_inflight(db *sql.DB) {
 	fmt.Println("--------------------------------------")
 	fmt.Println("\t\tActive Queries")

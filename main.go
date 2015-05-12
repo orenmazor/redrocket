@@ -11,6 +11,7 @@ func main() {
 	index_usage := flag.Bool("index-usage", false, "report on pg index usage")
 	seq_scans := flag.Bool("seq-scans", false, "report on pg seq scans")
 	inflight := flag.Bool("inflight", false, "report on currently running queries")
+	diskbased := flag.Bool("diskbased", false, "report on queries that went to disk")
 	flag.Parse()
 
 	// this respects all of the postgres environment vars:
@@ -23,6 +24,10 @@ func main() {
 
 	// fail on connection early
 	PING(db)
+
+	if *diskbased {
+		report_on_diskbased_queries(db)
+	}
 
 	if *cache {
 		report_on_cache_hits(db)
