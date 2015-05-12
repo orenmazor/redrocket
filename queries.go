@@ -83,11 +83,12 @@ func report_on_most_time_consuming(db *sql.DB) {
 
 	defer rows.Close()
 
+	fmt.Printf("%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%s\n", "database", "times_called", "min_minutes", "max_minutes", "avg_minutes", "total_minutes", "qrytext")
 	for rows.Next() {
 		var database, times_called, qrytext, min_minutes, max_minutes, avg_minutes, total_minutes string
 		err := rows.Scan(&database, &times_called, &qrytext, &min_minutes, &max_minutes, &avg_minutes, &total_minutes)
 		check(err)
-		fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", database, times_called, min_minutes, max_minutes, avg_minutes, total_minutes, qrytext)
+		fmt.Printf("%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%s\n", database, times_called, min_minutes, max_minutes, avg_minutes, total_minutes, qrytext)
 	}
 
 	check(rows.Err())
