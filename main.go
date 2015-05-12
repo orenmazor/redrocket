@@ -7,7 +7,6 @@ import "database/sql"
 import "flag"
 
 func main() {
-	seq_scans := flag.Bool("seq-scans", false, "report on pg seq scans")
 	inflight := flag.Bool("inflight", false, "report on currently running queries")
 	diskbased := flag.Bool("diskbased", false, "report on queries that went to disk")
 	most_time_consuming := flag.Bool("time-consuming", false, "report on most time consuming queries")
@@ -44,10 +43,6 @@ func main() {
 
 	if *diskbased {
 		report_on_diskbased_queries(db)
-	}
-
-	if *seq_scans {
-		report_on_seq_scans(db)
 	}
 
 	if *inflight {

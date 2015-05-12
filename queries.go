@@ -13,10 +13,14 @@ func PING(db *sql.DB) {
 	fmt.Println(result)
 }
 
+func print_header(title string) {
+	fmt.Println("-------------------------------------------------------------------------------------------")
+	fmt.Printf("%20s\n", title)
+	fmt.Println("-------------------------------------------------------------------------------------------")
+}
+
 func report_on_queued_queries(db *sql.DB) {
-	fmt.Println("--------------------------------------")
-	fmt.Println("\t\tLong queued queries")
-	fmt.Println("--------------------------------------")
+	print_header("Long queued queries")
 
 	query := `
 	select trim(database) as DB , w.query, 
@@ -49,9 +53,7 @@ func report_on_queued_queries(db *sql.DB) {
 }
 
 func report_on_most_time_consuming(db *sql.DB) {
-	fmt.Println("--------------------------------------")
-	fmt.Println("\t\tMost Time Consuming")
-	fmt.Println("--------------------------------------")
+	print_header("Most Time Consuming")
 
 	query := `
 	select trim(database) as db, count(query) as times_called,
@@ -90,31 +92,8 @@ func report_on_most_time_consuming(db *sql.DB) {
 	check(rows.Err())
 }
 
-func report_on_seq_scans(db *sql.DB) {
-	fmt.Println("--------------------------------------")
-	fmt.Println("\t\tSeq Scans")
-	fmt.Println("--------------------------------------")
-
-	query := "SELECT relname AS name, seq_scan as count FROM pg_stat_user_tables ORDER BY seq_scan DESC;"
-	rows, err := db.Query(query)
-	check(err)
-
-	defer rows.Close()
-
-	for rows.Next() {
-		var username, query, duration string
-		err := rows.Scan(&username, &query, &duration)
-		check(err)
-		fmt.Printf("%s\t%s\t%s\n", duration, username, query)
-	}
-
-	check(rows.Err())
-}
-
 func report_on_diskbased_queries(db *sql.DB) {
-	fmt.Println("--------------------------------------")
-	fmt.Println("\t\tDiskbased Queries")
-	fmt.Println("--------------------------------------")
+	print_header("Diskbased Queries")
 
 	query := "select pg_user.usename, stl_querytext.text, svl_query_summary.rows, svl_query_summary.workmem/(1024*1024*1024) as workmem_mb, svl_query_summary.label from svl_query_summary left join STL_QUERYTEXT on svl_query_summary.query=stl_querytext.query left join pg_user on pg_user.usesysid=stl_querytext.userid where is_diskbased='t' order by workmem_mb desc, svl_query_summary.rows desc;"
 
@@ -135,9 +114,7 @@ func report_on_diskbased_queries(db *sql.DB) {
 }
 
 func report_on_data_dist(db *sql.DB) {
-	fmt.Println("--------------------------------------")
-	fmt.Println("\t\tData Distribution")
-	fmt.Println("--------------------------------------")
+	print_header("Data Distribution")
 
 	query := `
 	select trim(pgn.nspname) as schema,
@@ -187,9 +164,7 @@ func report_on_data_dist(db *sql.DB) {
 }
 
 func report_on_query_queues(db *sql.DB) {
-	fmt.Println("--------------------------------------")
-	fmt.Println("\t\tClass backlog report")
-	fmt.Println("--------------------------------------")
+	print_header("Class backlog report")
 
 	query := `
 	select service_class as svc_class, count(*),
@@ -217,9 +192,7 @@ func report_on_query_queues(db *sql.DB) {
 }
 
 func report_on_inflight(db *sql.DB) {
-	fmt.Println("--------------------------------------")
-	fmt.Println("\t\tActive Queries")
-	fmt.Println("--------------------------------------")
+	print_header("Active Queries")
 
 	query := "select pg_user.usename, stv_inflight.text, to_char(stv_inflight.starttime, 'HH24:MI:SS') as starttime from stv_inflight LEFT OUTER JOIN pg_user ON pg_user.usesysid = stv_inflight.userid order by starttime asc;"
 
