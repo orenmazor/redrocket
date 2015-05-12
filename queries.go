@@ -75,7 +75,7 @@ func report_on_most_time_consuming(db *sql.DB) {
 	on alrt.query = stl_query.query
 	where userid <> 1 and starttime >=  dateadd(day, -7, current_date)) 
 	group by database, label, qry_md5, aborted
-	order by total_minutes desc limit 10;
+	order by total_minutes desc limit 35;
 	`
 
 	rows, err := db.Query(query)
