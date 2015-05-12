@@ -183,11 +183,12 @@ func report_on_query_queues(db *sql.DB) {
 
 	defer rows.Close()
 
+	fmt.Printf("%-5s\t%-10s\t%-15s\t%s\n", "svc", "count", "avg_queue_time", "avg_exec_time")
 	for rows.Next() {
 		var svc, count, avg_queue_time, avg_exec_time string
 		err := rows.Scan(&svc, &count, &avg_queue_time, &avg_exec_time)
 		check(err)
-		fmt.Printf("%5s\t%10s\t%15s\t%15s\n", svc, count, avg_queue_time, avg_exec_time)
+		fmt.Printf("%-5s\t%-10s\t%-15s\t%s\n", svc, count, avg_queue_time, avg_exec_time)
 	}
 
 	check(rows.Err())
