@@ -94,7 +94,7 @@ func report_on_diskbased_queries(db *sql.DB) {
 
 		err := rows.Scan(&username, &query, &rows_affected, &workmem, &label)
 		check(err)
-		fmt.Println("%s\t%s\t%s\t%s\t%s", username, query, rows_affected, workmem, label)
+		fmt.Println("%s\t%s\t%s\t%s\t%s", strings.TrimSpace(username), query, rows_affected, workmem, label)
 	}
 
 	check(rows.Err())
