@@ -19,6 +19,25 @@ func print_header(title string) {
 	fmt.Println("-------------------------------------------------------------------------------------------")
 }
 
+func report_on_active_sessions(db *sql.DB) {
+	print_header("Active users")
+
+	query := "select user_name, count(*) from stv_sessions group by user_name;"
+	rows, err := db.Query(query)
+	check(err)
+
+	fmt.Printf("%-20s\t%-20s\n", "user", "# sessions")
+	for rows.Next() {
+		var user, sessions string
+		err := rows.Scan(&user, &sessions)
+		check(err)
+		fmt.Printf("%-20s\t%-20s\n", user, sessions)
+	}
+
+	check(rows.Err())
+
+}
+
 func report_on_queued_queries(db *sql.DB) {
 	print_header("Long queued queries")
 

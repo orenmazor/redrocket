@@ -13,6 +13,7 @@ func main() {
 	data_dist := flag.Bool("data-dist", false, "report on data disk distribution")
 	query_queues := flag.Bool("query-queues", false, "report on service query queues")
 	queued_queries := flag.Bool("queued-queries", false, "report on queries that live in the queue too much")
+	active_sessions := flag.Bool("sessions", false, "report on active sessions")
 	flag.Parse()
 
 	// this respects all of the postgres environment vars:
@@ -25,6 +26,10 @@ func main() {
 
 	// fail on connection early
 	PING(db)
+
+	if *active_sessions {
+		report_on_active_sessions(db)
+	}
 
 	if *queued_queries {
 		report_on_queued_queries(db)
