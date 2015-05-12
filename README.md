@@ -11,9 +11,7 @@ This tool accepts any environment configuraiton that libpq accepts. For more inf
 ```
 redrocket -h
 
-  -cache-hit=false: report on pg cache hit
   -diskbased=false: report on queries that went to disk
-  -index-usage=false: report on pg index usage
   -inflight=false: report on currently running queries
   -seq-scans=false: report on pg seq scans
   -time-consuming=false: report on most time consuming queries

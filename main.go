@@ -8,7 +8,6 @@ import "flag"
 
 func main() {
 	cache := flag.Bool("cache-hit", false, "report on pg cache hit")
-	index_usage := flag.Bool("index-usage", false, "report on pg index usage")
 	seq_scans := flag.Bool("seq-scans", false, "report on pg seq scans")
 	inflight := flag.Bool("inflight", false, "report on currently running queries")
 	diskbased := flag.Bool("diskbased", false, "report on queries that went to disk")
