@@ -13,6 +13,41 @@ func PING(db *sql.DB) {
 	fmt.Println(result)
 }
 
+func report_on_queued_queries(db *sql.DB) {
+	fmt.Println("--------------------------------------")
+	fmt.Println("\t\tLong queued queries")
+	fmt.Println("--------------------------------------")
+
+	query := `
+	select trim(database) as DB , w.query, 
+	substring(q.querytxt, 1, 100) as querytxt, 
+	w.service_class as class, 
+	w.total_queue_time/1000000 as queue_seconds, 
+	w.total_exec_time/1000000 exec_seconds, (w.total_queue_time+w.total_Exec_time)/1000000 as total_seconds 
+	from stl_wlm_query w 
+	left join stl_query q on q.query = w.query and q.userid = w.userid 
+	where w.queue_start_Time >= dateadd(day, -7, current_Date) 
+	and w.total_queue_Time > 0  and w.userid >1   
+	and q.starttime >= dateadd(day, -7, current_Date) 
+	order by w.total_queue_time desc, w.queue_start_time desc limit 35;
+	`
+
+	rows, err := db.Query(query)
+	check(err)
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var db, query, querytxt, class, queue_seconds, exec_seconds, total_seconds string
+		err := rows.Scan(&db, &query, &querytxt, &class, &queue_seconds, &exec_seconds, &total_seconds)
+		check(err)
+		fmt.Printf("%10s\t%10s\t%5s\t%5s\t%5\t%5s\t%5s\t%s\n", db, query, class, queue_seconds, exec_seconds, total_seconds, querytxt)
+	}
+
+	check(rows.Err())
+
+}
+
 func report_on_most_time_consuming(db *sql.DB) {
 	fmt.Println("--------------------------------------")
 	fmt.Println("\t\tMost Time Consuming")

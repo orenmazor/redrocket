@@ -17,5 +17,6 @@ redrocket -h
   -time-consuming=false: report on most time consuming queries
   -data-dist=false: report on data distribution
   -query-queues=false: report on service query queues
+  -queued-queries=false: report on queries that spend their life in queue
 
 ```

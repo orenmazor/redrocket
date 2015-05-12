@@ -7,13 +7,13 @@ import "database/sql"
 import "flag"
 
 func main() {
-	cache := flag.Bool("cache-hit", false, "report on pg cache hit")
 	seq_scans := flag.Bool("seq-scans", false, "report on pg seq scans")
 	inflight := flag.Bool("inflight", false, "report on currently running queries")
 	diskbased := flag.Bool("diskbased", false, "report on queries that went to disk")
 	most_time_consuming := flag.Bool("time-consuming", false, "report on most time consuming queries")
 	data_dist := flag.Bool("data-dist", false, "report on data disk distribution")
 	query_queues := flag.Bool("query-queues", false, "report on service query queues")
+	queued_queries := flag.Bool("queued-queries", false, "report on queries that live in the queue too much")
 	flag.Parse()
 
 	// this respects all of the postgres environment vars:
@@ -26,6 +26,10 @@ func main() {
 
 	// fail on connection early
 	PING(db)
+
+	if *queued_queries {
+		report_on_queued_queries(db)
+	}
 
 	if *query_queues {
 		report_on_query_queues(db)
@@ -40,14 +44,6 @@ func main() {
 
 	if *diskbased {
 		report_on_diskbased_queries(db)
-	}
-
-	if *cache {
-		report_on_cache_hits(db)
-	}
-
-	if *index_usage {
-		report_on_index_usage(db)
 	}
 
 	if *seq_scans {
