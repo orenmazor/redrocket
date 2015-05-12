@@ -194,6 +194,33 @@ func report_on_data_dist(db *sql.DB) {
 }
 
 func report_on_query_queues(db *sql.DB) {
+	fmt.Println("--------------------------------------")
+	fmt.Println("\t\tClass backlog report")
+	fmt.Println("--------------------------------------")
+
+	query := `
+	select service_class as svc_class, count(*),
+	avg(datediff(microseconds, queue_start_time, queue_end_time)) as avg_queue_time,
+	avg(datediff(microseconds, exec_start_time, exec_end_time )) as avg_exec_time
+	from stl_wlm_query
+	where service_class > 4
+	group by service_class
+	order by service_class;
+	`
+
+	rows, err := db.Query(query)
+	check(err)
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var svc, count, avg_queue_time, avg_exec_time string
+		err := rows.Scan(&svc, &count, &avg_queue_time, &avg_exec_time)
+		check(err)
+		fmt.Printf("%5s\t%10s\t%15s\t%15s\n", svc, count, avg_queue_time, avg_exec_time)
+	}
+
+	check(rows.Err())
 }
 
 func report_on_inflight(db *sql.DB) {

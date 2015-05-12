@@ -14,6 +14,7 @@ func main() {
 	diskbased := flag.Bool("diskbased", false, "report on queries that went to disk")
 	most_time_consuming := flag.Bool("time-consuming", false, "report on most time consuming queries")
 	data_dist := flag.Bool("data-dist", false, "report on data disk distribution")
+	query_queues := flag.Bool("query-queues", false, "report on service query queues")
 	flag.Parse()
 
 	// this respects all of the postgres environment vars:
@@ -27,6 +28,9 @@ func main() {
 	// fail on connection early
 	PING(db)
 
+	if *query_queues {
+		report_on_query_queues(db)
+	}
 	if *data_dist {
 		report_on_data_dist(db)
 	}
