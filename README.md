@@ -16,5 +16,6 @@ redrocket -h
   -index-usage=false: report on pg index usage
   -inflight=false: report on currently running queries
   -seq-scans=false: report on pg seq scans
+  -time-consuming=false: report on most time consuming queries
 
 ```

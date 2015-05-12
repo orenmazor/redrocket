@@ -12,6 +12,7 @@ func main() {
 	seq_scans := flag.Bool("seq-scans", false, "report on pg seq scans")
 	inflight := flag.Bool("inflight", false, "report on currently running queries")
 	diskbased := flag.Bool("diskbased", false, "report on queries that went to disk")
+	most_time_consuming := flag.Bool("time-consuming", false, "report on most time consuming queries")
 	flag.Parse()
 
 	// this respects all of the postgres environment vars:
@@ -24,6 +25,10 @@ func main() {
 
 	// fail on connection early
 	PING(db)
+
+	if *most_time_consuming {
+		report_on_most_time_consuming(db)
+	}
 
 	if *diskbased {
 		report_on_diskbased_queries(db)
