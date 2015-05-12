@@ -17,5 +17,6 @@ redrocket -h
   -inflight=false: report on currently running queries
   -seq-scans=false: report on pg seq scans
   -time-consuming=false: report on most time consuming queries
+  -data-dist=false: report on data distribution
 
 ```
