@@ -27,7 +27,7 @@ func report_on_queued_queries(db *sql.DB) {
 	substring(q.querytxt, 1, 100) as querytxt, 
 	w.service_class as class, 
 	w.total_queue_time/1000000 as queue_seconds, 
-	w.total_exec_time/1000000 exec_seconds, (w.total_queue_time+w.total_Exec_time)/1000000 as total_seconds 
+	w.total_exec_time/1000000 as exec_seconds, (w.total_queue_time+w.total_Exec_time)/1000000 as total_seconds 
 	from stl_wlm_query w 
 	left join stl_query q on q.query = w.query and q.userid = w.userid 
 	where w.queue_start_Time >= dateadd(day, -7, current_Date) 
@@ -41,11 +41,12 @@ func report_on_queued_queries(db *sql.DB) {
 
 	defer rows.Close()
 
+	fmt.Printf("%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", "db", "query", "class", "queue_seconds", "exec_seconds", "total_seconds", "querytxt")
 	for rows.Next() {
 		var db, query, querytxt, class, queue_seconds, exec_seconds, total_seconds string
 		err := rows.Scan(&db, &query, &querytxt, &class, &queue_seconds, &exec_seconds, &total_seconds)
 		check(err)
-		fmt.Printf("%10s\t%10s\t%5s\t%5s\t%5\t%5s\t%5s\t%s\n", db, query, class, queue_seconds, exec_seconds, total_seconds, querytxt)
+		fmt.Printf("%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", db, query, class, queue_seconds, exec_seconds, total_seconds, querytxt)
 	}
 
 	check(rows.Err())
