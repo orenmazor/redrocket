@@ -193,12 +193,15 @@ func report_on_data_dist(db *sql.DB) {
 	check(rows.Err())
 }
 
+func report_on_query_queues(db *sql.DB) {
+}
+
 func report_on_inflight(db *sql.DB) {
 	fmt.Println("--------------------------------------")
 	fmt.Println("\t\tActive Queries")
 	fmt.Println("--------------------------------------")
 
-	query := "select pg_user.usename, stv_inflight.text, (stv_inflight.starttime - getdate()) as duration from stv_inflight LEFT OUTER JOIN pg_user ON pg_user.usesysid = stv_inflight.userid order by duration desc;"
+	query := "select pg_user.usename, stv_inflight.text, to_char(stv_inflight.starttime, 'HH24:MI:SS') as starttime from stv_inflight LEFT OUTER JOIN pg_user ON pg_user.usesysid = stv_inflight.userid order by starttime asc;"
 
 	rows, err := db.Query(query)
 	check(err)
@@ -206,10 +209,10 @@ func report_on_inflight(db *sql.DB) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var username, query, duration string
-		err := rows.Scan(&username, &query, &duration)
+		var username, query, starttime string
+		err := rows.Scan(&username, &query, &starttime)
 		check(err)
-		fmt.Printf("%s\t%s\t%s\n", duration, strings.TrimSpace(username), strings.TrimSpace(query))
+		fmt.Printf("%10s\t%16s\t%s\n", starttime, strings.TrimSpace(username), strings.TrimSpace(query))
 	}
 
 	check(rows.Err())
