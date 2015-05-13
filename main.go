@@ -14,6 +14,7 @@ func main() {
 	query_queues := flag.Bool("query-queues", false, "report on service query queues")
 	queued_queries := flag.Bool("queued-queries", false, "report on queries that live in the queue too much")
 	active_sessions := flag.Bool("sessions", false, "report on active sessions")
+	workload_by_user := flag.Bool("user-wlm", false, "report on user/queue workload")
 	flag.Parse()
 
 	// this respects all of the postgres environment vars:
@@ -26,6 +27,10 @@ func main() {
 
 	// fail on connection early
 	PING(db)
+
+	if *workload_by_user {
+		report_on_workload_by_user(db)
+	}
 
 	if *active_sessions {
 		report_on_active_sessions(db)

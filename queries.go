@@ -19,6 +19,33 @@ func print_header(title string) {
 	fmt.Println("-------------------------------------------------------------------------------------------")
 }
 
+func report_on_workload_by_user(db *sql.DB) {
+	print_header("User/Queue workload management")
+
+	query := `
+	select pg_user.usename, stl_wlm_query.service_class, sum(datediff(seconds, starttime, endtime)) as total_query_time,
+	count(trim(querytxt))
+	from stl_query
+	  left join pg_user on stl_query.userid=pg_user.usesysid
+		  left join stl_wlm_query on stl_Query.query=stl_wlm_query.query
+			where starttime >= '2015-05-12 00:00' and endtime < '2015-05-12 23:59'
+			  group by pg_user.usename, stl_wlm_query.service_class
+				order by total_query_time desc;
+	`
+	rows, err := db.Query(query)
+	check(err)
+
+	fmt.Printf("%-20s\t%-20s\t%-20s\t%-20s\n", "username", "service class", "total query time", "count")
+	for rows.Next() {
+		var username, service_class, query_time, count string
+		err := rows.Scan(&username, &service_class, &query_time, &count)
+		check(err)
+		fmt.Printf("%-20s\t%-20s\t%-20s\t%-20s\n", strings.TrimSpace(username), service_class, query_time, count)
+	}
+
+	check(rows.Err())
+
+}
 func report_on_active_sessions(db *sql.DB) {
 	print_header("Active users")
 
